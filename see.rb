@@ -12,7 +12,7 @@ client = Twitter::REST::Client.new do |config|
   config.access_token_secret = ENV["ACCESS_SECRET"]
 end
 
-print "Which user's timeline do you want to see? "
+print "Which user's mentions do you want to see? "
 user = gets.chomp
 
 NUMBER = 10
@@ -20,11 +20,12 @@ puts "First #{NUMBER} tweets"
 
 last_id = nil #for pagination
 while true do
-  options = {count: NUMBER, include_rts: true}
+  options = {include_rts: true, result_type: "recent"}
   #only care about this on sequential page loads
   options[:max_id] = (last_id-1) unless last_id.nil? #max_id because we're going backwards
 
-  client.user_timeline(user, options)
+  #client.mentions_timeline(user, options)
+  client.search("to:#{user}", options).take(NUMBER)
   .each do |tweet| 
     puts "\033[34m#{tweet.id}\033[0m:" #should colour it blue
     puts tweet.text
